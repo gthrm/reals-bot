@@ -1,6 +1,7 @@
 const { Telegraf } = require('telegraf');
 const puppeteer = require('puppeteer');
 const { config } = require('dotenv');
+const { logger } = require('./utils/logger.utils');
 
 config();
 
@@ -21,10 +22,12 @@ bot.on('text', async (ctx) => {
   const { text } = ctx.message;
   if (text.startsWith('https://www.instagram.com/reel/')) {
     try {
+      logger.info(text);
       const videoUrl = await extractVideoUrlFromInstagramRils(text);
-
+      logger.info(videoUrl);
       await ctx.replyWithVideo({ url: videoUrl });
     } catch (error) {
+      logger.error(error);
       await ctx.reply('Не удалось загрузить видео из Reals');
     }
   } else {
