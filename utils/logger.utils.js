@@ -1,4 +1,5 @@
 const { createLogger, format, transports } = require('winston');
+const TelegramTransport = require('./telegram-transport.utils');
 require('dotenv').config();
 
 const logger = createLogger({
@@ -34,6 +35,13 @@ if (process.env.NODE_ENV !== 'production') {
     ),
   }));
 }
+
+const telegramTransport = new TelegramTransport({
+  telegramBotToken: process.env.BOT_TOKEN,
+  chatId: process.env.CHAT_ID,
+});
+
+logger.add(telegramTransport);
 
 module.exports = {
   logger,
