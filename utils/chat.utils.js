@@ -19,7 +19,6 @@ async function getAnswer(text) {
     // Specify "stop" sequences if there are any indications that the bot is veering off course
     stop: ['\n', '```'], // Prevents the bot from generating code blocks or extensive content beyond a single message.
   });
-
   return completion.choices[0];
 }
 

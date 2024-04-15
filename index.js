@@ -1,6 +1,8 @@
+/* eslint-disable camelcase */
 const { Telegraf } = require('telegraf');
 const puppeteer = require('puppeteer');
 const { config } = require('dotenv');
+const shell = require('shelljs');
 const { logger } = require('./utils/logger.utils');
 const { getAnswer } = require('./utils/chat.utils');
 
@@ -25,27 +27,36 @@ bot.command('starttalking', async (ctx) => {
 
 bot.help((ctx) => ctx.reply('Send me the Instagram reals link 😜'));
 
-async function extractVideoUrlFromInstagramReals(url) {
+async function extractVideoUrlFromInstagramReals(url, ctx) {
   const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(url, { waitUntil: 'networkidle2' });
-  await page.waitForSelector('video');
-  const videoUrl = await page.$eval('video', (el) => el.src);
-  await browser.close();
-  return videoUrl;
+  try {
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.waitForSelector('video', { timeout: 50000 });
+    const videoUrl = await page.$eval('video', (el) => el.src);
+    return videoUrl;
+  } catch (error) {
+    logger.error(error);
+    await ctx.reply('Something went wrong! Please try again!');
+    return null;
+  } finally {
+    await browser.close();
+    shell.exec('pkill chrome');
+  }
 }
 
 bot.on('text', async (ctx) => {
-  const { text, chat, from } = ctx.message;
-
+  const {
+    text, chat, from, message_id,
+  } = ctx.message;
   if (text.startsWith('https://www.instagram.com/reel/')) {
     try {
       logger.info(text);
       const waitMessage = await ctx.reply('Wait a second...');
 
-      const videoUrl = await extractVideoUrlFromInstagramReals(text);
+      const videoUrl = await extractVideoUrlFromInstagramReals(text, ctx);
       logger.info(videoUrl);
-      await ctx.replyWithVideo({ url: videoUrl });
+      await ctx.replyWithVideo({ url: videoUrl }, { reply_to_message_id: message_id });
       await ctx.deleteMessage(waitMessage.message_id);
     } catch (error) {
       logger.error(error);
