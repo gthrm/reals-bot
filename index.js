@@ -40,9 +40,9 @@ async function extractVideoUrlFromInstagramReals(url, ctx) {
     await ctx.reply('Something went wrong! Please try again!');
     return null;
   } finally {
-    logger.log(browser.pages());
+    logger.info(browser.pages());
     await browser.close();
-    logger.log('browser closed');
+    logger.info('browser closed');
   }
 }
 
