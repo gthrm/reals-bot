@@ -43,7 +43,6 @@ async function extractVideoUrlFromInstagramReals(url, ctx) {
   } finally {
     logger.log(browser.pages());
     await browser.close();
-    shell.exec('pkill chrome');
   }
 }
 
