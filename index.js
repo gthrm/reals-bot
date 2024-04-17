@@ -34,6 +34,7 @@ async function extractVideoUrlFromInstagramReals(url, ctx) {
     await page.goto(url, { waitUntil: 'networkidle2' });
     await page.waitForSelector('video', { timeout: 50000 });
     const videoUrl = await page.$eval('video', (el) => el.src);
+    await page.close();
     return videoUrl;
   } catch (error) {
     logger.error(error);
