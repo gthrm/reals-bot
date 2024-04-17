@@ -42,6 +42,7 @@ async function extractVideoUrlFromInstagramReals(url, ctx) {
   } finally {
     logger.log(browser.pages());
     await browser.close();
+    logger.log('browser closed');
   }
 }
 
