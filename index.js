@@ -2,7 +2,6 @@
 const { Telegraf } = require('telegraf');
 const puppeteer = require('puppeteer');
 const { config } = require('dotenv');
-const shell = require('shelljs');
 const { logger } = require('./utils/logger.utils');
 const { getAnswer } = require('./utils/chat.utils');
 
