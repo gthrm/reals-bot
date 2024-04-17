@@ -41,6 +41,7 @@ async function extractVideoUrlFromInstagramReals(url, ctx) {
     await ctx.reply('Something went wrong! Please try again!');
     return null;
   } finally {
+    logger.log(browser.pages());
     await browser.close();
     shell.exec('pkill chrome');
   }
