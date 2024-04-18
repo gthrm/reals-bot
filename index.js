@@ -3,11 +3,15 @@ const { Telegraf } = require('telegraf');
 const puppeteer = require('puppeteer');
 const { config } = require('dotenv');
 const { logger } = require('./utils/logger.utils');
-const { init, getAnswer } = require('./utils/chat.utils');
+const { getAnswer } = require('./utils/chat.utils');
+const { RedisClient } = require('./utils/redis.utils');
 
 config();
 
-let IS_ALIVE = process.env.IS_ALIVE === 'true';
+const redisClient = new RedisClient();
+redisClient.init();
+
+const IS_ALIVE = process.env.IS_ALIVE === 'true';
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 bot.start((ctx) => ctx.reply('Hey there!'));
@@ -15,13 +19,13 @@ bot.start((ctx) => ctx.reply('Hey there!'));
 bot.command('oldschool', (ctx) => ctx.reply('Hello'));
 bot.command('hipster', Telegraf.reply('λ'));
 bot.command('stoptalking', async (ctx) => {
-  IS_ALIVE = false;
-  await ctx.reply('Okay! I will not talk anymore!');
+  await redisClient.set(`IS_MUTED_${ctx.chat.id}`, true);
+  return ctx.reply('Okay! I will not talk anymore!');
 });
 
 bot.command('starttalking', async (ctx) => {
-  IS_ALIVE = true;
-  await ctx.reply('Okay! I am ready to talk!');
+  await redisClient.set(`IS_MUTED_${ctx.chat.id}`, false);
+  return ctx.reply('Okay! I am ready to talk!');
 });
 
 bot.help((ctx) => ctx.reply('Send me the Instagram reals link 😜'));
@@ -49,6 +53,8 @@ bot.on('text', async (ctx) => {
   const {
     text, chat, from, message_id,
   } = ctx.message;
+  const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
+
   if (text.startsWith('https://www.instagram.com/reel/')) {
     try {
       logger.info(text);
@@ -62,9 +68,9 @@ bot.on('text', async (ctx) => {
       logger.error(error);
       await ctx.reply('Something went wrong! Please try again!');
     }
-  } else if (IS_ALIVE && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`) && !from.is_bot) {
+  } else if (IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`) && !from.is_bot) {
     try {
-      const answerData = await getAnswer(chat.id, text);
+      const answerData = await getAnswer(chat.id, text, redisClient);
       if (answerData?.message?.content) {
         await ctx.reply(answerData.message.content);
       }
@@ -80,6 +86,5 @@ bot.on('sticker', (ctx) => ctx.reply('👍'));
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
-init().then(() => {
-  bot.launch();
-});
+
+bot.launch();

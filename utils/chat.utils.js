@@ -1,48 +1,36 @@
 const OpenAI = require('openai');
 const { config } = require('dotenv');
-const { createClient } = require('redis');
-const { logger } = require('./logger.utils');
 
 config();
+
 const openai = new OpenAI();
 
-const redisClient = createClient({
-  url: process.env.REDIS_URL,
-});
-
-async function init() {
-// Creating a Redis client
-  logger.info('Connecting to Redis client');
-  redisClient.on('error', (err) => logger.error('Redis Client Error', err));
-  await redisClient.connect();
-  logger.info('Redis client connected');
-}
-
-async function getUserMessages(userId) {
+async function getUserMessages(userId, redisClient) {
   const messagesJson = await redisClient.get(`${userId}`);
-  return messagesJson ? JSON.parse(messagesJson) : [];
+  return messagesJson || [];
 }
 
-async function saveUserMessages(userId, messages) {
+async function saveUserMessages(userId, messages, redisClient) {
   // Keep only the last 20 messages
   const recentMessages = messages.slice(-20);
-  await redisClient.set(`${userId}`, JSON.stringify(recentMessages));
+  await redisClient.set(`${userId}`, recentMessages);
 }
 
-async function getAnswer(userId, text) {
-  const prompt = 'You are a chatbot designed to engage in conversation with users. You should feel yourself like their friend! Your main function is to understand users\' questions and provide informative and engaging responses. You should not perform tasks outside of conversational engagement, such as writing code, generating URLs, or creating detailed technical content. Use russian language for communication.';
+async function getAnswer(userId, text, redisClient) {
+  const prompt = 'You are a chatbot designed to engage in conversation with users. You should feel yourself like their friend! Your main function is to understand users\' questions and provide informative and engaging responses. You should not perform tasks outside of conversational engagement, such as writing code, generating URLs, or creating detailed technical content. Use russian language for communication. Пиши очкень кратко! Веди себя как человек 25 лет, девушка! Ты программист! Создай общение, как в Телеграм-чате. Используй стиль и тон предыдущих сообщений для ответов. Будь дружелюбным, кратким и по делу. Адаптируйся под тему и настроение собеседника.';
 
   // Retrieve user message history
-  const userMessages = await getUserMessages(userId);
+  const userMessages = await getUserMessages(userId, redisClient);
 
   // Adding new user message
   userMessages.push({ role: 'user', content: text });
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
+    // model: 'gpt-4-turbo-2024-04-09',
     messages: [{ role: 'system', content: prompt }, ...userMessages],
     temperature: 0.2,
-    max_tokens: 256,
+    // max_tokens: 256,
     stop: ['\n', '```'],
   });
 
@@ -50,10 +38,10 @@ async function getAnswer(userId, text) {
   if (completion.choices[0] && completion.choices[0].message) {
     userMessages.push({ role: 'system', content: completion.choices[0].message.content });
     // Save updated history to Redis
-    await saveUserMessages(userId, userMessages);
+    await saveUserMessages(userId, userMessages, redisClient);
   }
 
   return completion.choices[0];
 }
 
-module.exports = { getAnswer, init };
+module.exports = { getAnswer };
