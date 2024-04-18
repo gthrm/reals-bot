@@ -3,7 +3,7 @@ const { Telegraf } = require('telegraf');
 const puppeteer = require('puppeteer');
 const { config } = require('dotenv');
 const { logger } = require('./utils/logger.utils');
-const { getAnswer } = require('./utils/chat.utils');
+const { init, getAnswer } = require('./utils/chat.utils');
 
 config();
 
@@ -64,7 +64,7 @@ bot.on('text', async (ctx) => {
     }
   } else if (IS_ALIVE && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`) && !from.is_bot) {
     try {
-      const answerData = await getAnswer(text);
+      const answerData = await getAnswer(chat.id, text);
       if (answerData?.message?.content) {
         await ctx.reply(answerData.message.content);
       }
@@ -80,5 +80,6 @@ bot.on('sticker', (ctx) => ctx.reply('👍'));
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-bot.launch();
+init().then(() => {
+  bot.launch();
+});
