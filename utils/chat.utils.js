@@ -29,8 +29,12 @@ async function getAnswer(userId, text, redisClient) {
     model: 'gpt-3.5-turbo',
     // model: 'gpt-4-turbo-2024-04-09',
     messages: [{ role: 'system', content: prompt }, ...userMessages],
-    temperature: 0.2,
+    // temperature: 0.2,
     // max_tokens: 256,
+    temperature: 0.9,
+    max_tokens: 2000,
+    frequency_penalty: 0.5,
+    presence_penalty: 0.5,
     stop: ['\n', '```'],
   });
 
