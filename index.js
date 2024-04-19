@@ -14,6 +14,33 @@ redisClient.init();
 const IS_ALIVE = process.env.IS_ALIVE === 'true';
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
+
+bot.use((ctx, next) => {
+  const {
+    text, chat, from, reply_to_message,
+  } = ctx?.message || {};
+
+  if (!from.is_bot) {
+    if (text && text.startsWith('https://www.instagram.com/reel/')) {
+      return next();
+    }
+
+    if (text && text.includes(`@${process.env.BOT_USERNAME}`)) {
+      return next();
+    }
+
+    if (reply_to_message && reply_to_message.from?.username === process.env.BOT_USERNAME) {
+      return next();
+    }
+
+    if (chat.type === 'private') {
+      return next();
+    }
+  }
+
+  return null;
+});
+
 bot.start((ctx) => ctx.reply('Hey there!'));
 
 bot.command('oldschool', (ctx) => ctx.reply('Hello'));
@@ -35,7 +62,7 @@ async function extractVideoUrlFromInstagramReals(url, ctx) {
   try {
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle2' });
-    await page.waitForSelector('video', { timeout: 120000 });
+    await page.waitForSelector('video', { timeout: 240000 });
     const videoUrl = await page.$eval('video', (el) => el.src);
     await page.close();
     return videoUrl;
@@ -51,33 +78,38 @@ async function extractVideoUrlFromInstagramReals(url, ctx) {
 
 bot.on('text', async (ctx) => {
   const {
-    text, chat, from, message_id,
+    text, chat, message_id,
   } = ctx.message;
-  const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
+  try {
+    const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
 
-  if (text.startsWith('https://www.instagram.com/reel/')) {
-    try {
-      logger.info(text);
-      const waitMessage = await ctx.reply('Wait a second...');
+    if (text.startsWith('https://www.instagram.com/reel/')) {
+      try {
+        logger.info(text);
+        const waitMessage = await ctx.reply('Wait a second...');
 
-      const videoUrl = await extractVideoUrlFromInstagramReals(text, ctx);
-      logger.info(videoUrl);
-      await ctx.replyWithVideo({ url: videoUrl }, { reply_to_message_id: message_id });
-      await ctx.deleteMessage(waitMessage.message_id);
-    } catch (error) {
-      logger.error(error);
-      await ctx.reply('Something went wrong! Please try again!');
-    }
-  } else if (IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`) && !from.is_bot) {
-    try {
-      const answerData = await getAnswer(chat.id, text, redisClient);
-      if (answerData?.message?.content) {
-        await ctx.reply(answerData.message.content);
+        const videoUrl = await extractVideoUrlFromInstagramReals(text, ctx);
+        logger.info(videoUrl);
+        await ctx.replyWithVideo({ url: videoUrl }, { reply_to_message_id: message_id });
+        await ctx.deleteMessage(waitMessage.message_id);
+      } catch (error) {
+        logger.error(error);
+        await ctx.reply('Something went wrong! Please try again!');
       }
-    } catch (error) {
-      logger.error(error);
-      await ctx.reply('Something went wrong! Please try again!');
+    } else if (IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`)) {
+      try {
+        const answerData = await getAnswer(chat.id, text, redisClient);
+        if (answerData?.message?.content) {
+          await ctx.reply(answerData.message.content);
+        }
+      } catch (error) {
+        logger.error(error);
+        await ctx.reply('Something went wrong! Please try again!');
+      }
     }
+  } catch (error) {
+    logger.error(error);
+    await ctx.reply('Something went wrong! Please try again!');
   }
 });
 
