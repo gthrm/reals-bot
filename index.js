@@ -47,12 +47,12 @@ bot.command('oldschool', (ctx) => ctx.reply('Hello'));
 bot.command('hipster', Telegraf.reply('λ'));
 bot.command('stoptalking', async (ctx) => {
   await redisClient.set(`IS_MUTED_${ctx.chat.id}`, true);
-  return ctx.reply('Okay! I will not talk anymore!');
+  return ctx.reply('Okay! I will not talk anymore!', { reply_to_message_id: ctx.message.message_id });
 });
 
 bot.command('starttalking', async (ctx) => {
   await redisClient.set(`IS_MUTED_${ctx.chat.id}`, false);
-  return ctx.reply('Okay! I am ready to talk!');
+  return ctx.reply('Okay! I am ready to talk!', { reply_to_message_id: ctx.message.message_id });
 });
 
 bot.help((ctx) => ctx.reply('Send me the Instagram reals link 😜'));
@@ -100,7 +100,7 @@ bot.on('text', async (ctx) => {
       try {
         const answerData = await getAnswer(chat.id, text, redisClient);
         if (answerData?.message?.content) {
-          await ctx.reply(answerData.message.content);
+          await ctx.reply(answerData.message.content, { reply_to_message_id: message_id });
         }
       } catch (error) {
         logger.error(error);
