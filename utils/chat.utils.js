@@ -35,7 +35,7 @@ async function getAnswer(userId, text, redisClient) {
     max_tokens: 2000,
     frequency_penalty: 0.5,
     presence_penalty: 0.5,
-    stop: ['\n', '```'],
+    // stop: ['\n', '```'],
   });
 
   // Update message history after receiving response
