@@ -1,9 +1,14 @@
+/* eslint-disable no-constructor-return */
 const { createClient } = require('redis');
 const { logger } = require('./logger.utils');
 
 class RedisClient {
   constructor() {
+    if (RedisClient.instance) {
+      return RedisClient.instance;
+    }
     this.client = null;
+    RedisClient.instance = this;
   }
 
   async init() {
