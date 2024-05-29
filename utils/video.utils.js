@@ -10,7 +10,9 @@ const redisClient = new RedisClient();
 const timeout = process.env.TIMEOUT || 240000;
 
 async function extractVideoUrlFromInstagramReals(url) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    headless: 'new',
+  });
   try {
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle2' });
