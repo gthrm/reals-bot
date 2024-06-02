@@ -70,12 +70,23 @@ class RealsVideoProcessor {
         } = video;
 
         const videoUrl = await extractVideoUrlFromInstagramReals(url);
+        logger.info(`Video URL: ${videoUrl}`);
         if (ctx.replyWithVideo) {
           await ctx.replyWithVideo({ url: videoUrl }, { reply_to_message_id });
-          await ctx.deleteMessage(message_id);
+          try {
+            await ctx.deleteMessage(message_id);
+          } catch (error) {
+            logger.error(error);
+            return null;
+          }
         } else {
           await ctx.sendVideo(chatId, videoUrl);
-          await ctx.deleteMessage(chatId, message_id);
+          try {
+            await ctx.deleteMessage(chatId, message_id);
+          } catch (error) {
+            logger.error(error);
+            return null;
+          }
         }
 
         this.isProcessing = false;
