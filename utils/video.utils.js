@@ -77,7 +77,6 @@ class RealsVideoProcessor {
             await ctx.deleteMessage(message_id);
           } catch (error) {
             logger.error(error);
-            return null;
           }
         } else {
           await ctx.sendVideo(chatId, videoUrl);
@@ -85,7 +84,6 @@ class RealsVideoProcessor {
             await ctx.deleteMessage(chatId, message_id);
           } catch (error) {
             logger.error(error);
-            return null;
           }
         }
 
