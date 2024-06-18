@@ -9,6 +9,8 @@ const redisClient = new RedisClient();
 
 const timeout = process.env.TIMEOUT || 240000;
 
+const errorMessage = 'Sorry! I am unable to process this video 😔. Unfortunately, the video is in blob format which is not supported. Thank you for understanding.';
+
 async function extractVideoUrlFromInstagramReals(url) {
   const browser = await puppeteer.launch({
     headless: 'new',
@@ -71,20 +73,26 @@ class RealsVideoProcessor {
 
         const videoUrl = await extractVideoUrlFromInstagramReals(url);
         logger.info(`Video URL: ${videoUrl}`);
-        if (ctx.replyWithVideo) {
-          await ctx.replyWithVideo({ url: videoUrl }, { reply_to_message_id });
-          try {
-            await ctx.deleteMessage(message_id);
-          } catch (error) {
-            logger.error(error);
+        if (!videoUrl.startsWith('blob')) {
+          if (ctx.replyWithVideo) {
+            await ctx.replyWithVideo({ url: videoUrl }, { reply_to_message_id });
+            try {
+              await ctx.deleteMessage(message_id);
+            } catch (error) {
+              logger.error(error);
+            }
+          } else {
+            await ctx.sendVideo(chatId, videoUrl);
+            try {
+              await ctx.deleteMessage(chatId, message_id);
+            } catch (error) {
+              logger.error(error);
+            }
           }
+        } else if (ctx.replyWithVideo) {
+          await ctx.reply(errorMessage, { reply_to_message_id });
         } else {
-          await ctx.sendVideo(chatId, videoUrl);
-          try {
-            await ctx.deleteMessage(chatId, message_id);
-          } catch (error) {
-            logger.error(error);
-          }
+          await ctx.sendMessage(chatId, errorMessage);
         }
 
         this.isProcessing = false;
