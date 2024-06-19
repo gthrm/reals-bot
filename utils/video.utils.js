@@ -71,18 +71,18 @@ class RealsVideoProcessor {
           url, message_id, reply_to_message_id, chatId,
         } = video;
 
-        const videoUrl = await extractVideoUrlFromInstagramReals(url);
+        const videoUrl = url.replace('instagram', 'ddinstagram');// await extractVideoUrlFromInstagramReals(url);
         logger.info(`Video URL: ${videoUrl}`);
         if (!videoUrl.startsWith('blob')) {
           if (ctx.replyWithVideo) {
-            await ctx.replyWithVideo({ url: videoUrl }, { reply_to_message_id });
+            await ctx.reply(videoUrl, { reply_to_message_id });
             try {
               await ctx.deleteMessage(message_id);
             } catch (error) {
               logger.error(error);
             }
           } else {
-            await ctx.sendVideo(chatId, videoUrl);
+            await ctx.sendMessage(chatId, videoUrl);
             try {
               await ctx.deleteMessage(chatId, message_id);
             } catch (error) {
