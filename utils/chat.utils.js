@@ -28,7 +28,7 @@ async function getAnswer(userId, text) {
   userMessages.push({ role: 'user', content: text });
 
   const completion = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
+    model: process.env.MODEL_NAME,
     // model: 'gpt-4-turbo-2024-04-09',
     messages: [{ role: 'system', content: prompt }, ...userMessages],
     // temperature: 0.2,
