@@ -73,7 +73,7 @@ bot.on('text', async (ctx) => {
   try {
     const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
 
-    if (text.startsWith('https://www.instagram.com/reel/')) {
+    if (isAvailableUrl(text)) {
       try {
         realsVideoProcessor.addVideoToQueue({ url: text, ctx });
       } catch (error) {
