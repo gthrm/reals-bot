@@ -15,6 +15,10 @@ const IS_ALIVE = process.env.IS_ALIVE === 'true';
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+function isAvailableUrl(url) {
+  return url.startsWith('https://www.instagram.com/reel/') || url.startsWith('https://x.com/') || url.startsWith('https://vt.tiktok.com/');
+}
+
 bot.launch();
 
 bot.use((ctx, next) => {
@@ -23,7 +27,7 @@ bot.use((ctx, next) => {
   } = ctx?.message || {};
 
   if (!from?.is_bot) {
-    if (text && text.startsWith('https://www.instagram.com/reel/')) {
+    if (text && isAvailableUrl(text)) {
       return next();
     }
 

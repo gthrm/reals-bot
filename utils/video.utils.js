@@ -1,31 +1,56 @@
 /* eslint-disable no-constructor-return */
 /* eslint-disable max-len */
 /* eslint-disable camelcase */
-const puppeteer = require('puppeteer');
+// const puppeteer = require('puppeteer');
 const { logger } = require('./logger.utils');
 const { RedisClient } = require('./redis.utils');
 
 const redisClient = new RedisClient();
 
-const timeout = process.env.TIMEOUT || 240000;
+// const timeout = process.env.TIMEOUT || 240000;
 
 const errorMessage = 'Sorry! I am unable to process this video 😔. Unfortunately, the video is in blob format which is not supported. Thank you for understanding.';
 
-async function extractVideoUrlFromInstagramReals(url) {
-  const browser = await puppeteer.launch({
-    headless: 'new',
-  });
-  try {
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle2' });
-    await page.waitForSelector('video', { timeout });
-    const videoUrl = await page.$eval('video', (el) => el.src);
-    await page.close();
-    return videoUrl;
-  } finally {
-    await browser.close();
-    logger.info('browser closed');
+// async function extractVideoUrlFromInstagramReals(url) {
+//   const browser = await puppeteer.launch({
+//     headless: 'new',
+//   });
+//   try {
+//     const page = await browser.newPage();
+//     await page.goto(url, { waitUntil: 'networkidle2' });
+//     await page.waitForSelector('video', { timeout });
+//     const videoUrl = await page.$eval('video', (el) => el.src);
+//     await page.close();
+//     return videoUrl;
+//   } finally {
+//     await browser.close();
+//     logger.info('browser closed');
+//   }
+// }
+
+function processUrl(url) {
+  if (!url) {
+    return null;
   }
+
+  switch (url) {
+    case url.includes('instagram'):
+      url.replace('instagram', 'ddinstagram');
+      break;
+
+    case url.includes('tiktok'):
+      url.replace('tiktok', 'tfxktok');
+      break;
+
+    case url.includes('x.xom'):
+      url.replace('x.xom', 'fxtwitter.com');
+      break;
+
+    default:
+      break;
+  }
+
+  return url;
 }
 
 class RealsVideoProcessor {
@@ -71,7 +96,7 @@ class RealsVideoProcessor {
           url, message_id, reply_to_message_id, chatId,
         } = video;
 
-        const videoUrl = url.replace('instagram', 'ddinstagram');// await extractVideoUrlFromInstagramReals(url);
+        const videoUrl = processUrl(url);// await extractVideoUrlFromInstagramReals(url);
         logger.info(`Video URL: ${videoUrl}`);
         if (!videoUrl.startsWith('blob')) {
           if (ctx.replyWithVideo) {
