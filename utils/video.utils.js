@@ -35,22 +35,17 @@ function processUrl(url) {
 
   switch (url) {
     case url.includes('instagram'):
-      url.replace('instagram', 'ddinstagram');
-      break;
+      return url.replace('instagram', 'ddinstagram');
 
     case url.includes('tiktok'):
-      url.replace('tiktok', 'tfxktok');
-      break;
+      return url.replace('tiktok', 'tfxktok');
 
     case url.includes('x.xom'):
-      url.replace('x.xom', 'fxtwitter.com');
-      break;
+      return url.replace('x.xom', 'fxtwitter.com');
 
     default:
-      break;
+      return url;
   }
-
-  return url;
 }
 
 class RealsVideoProcessor {
