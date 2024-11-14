@@ -38,7 +38,7 @@ function processUrl(url) {
   }
 
   if (url.includes('tiktok')) {
-    return url.replace('tiktok', 'tfxktok');
+    return url.replace('vt.tiktok', 'tfxktok');
   }
 
   if (url.includes('x.com')) {
