@@ -33,19 +33,18 @@ function processUrl(url) {
     return null;
   }
 
-  switch (url) {
-    case url.includes('instagram'):
-      return url.replace('instagram', 'ddinstagram');
-
-    case url.includes('tiktok'):
-      return url.replace('tiktok', 'tfxktok');
-
-    case url.includes('x.com'):
-      return url.replace('x.com', 'fxtwitter.com');
-
-    default:
-      return url;
+  if (url.includes('instagram')) {
+    return url.replace('instagram', 'ddinstagram');
   }
+
+  if (url.includes('tiktok')) {
+    return url.replace('tiktok', 'tfxktok');
+  }
+
+  if (url.includes('x.com')) {
+    return url.replace('x.com', 'fxtwitter.com');
+  }
+  return url;
 }
 
 class RealsVideoProcessor {
@@ -63,7 +62,10 @@ class RealsVideoProcessor {
     const waitMessage = await ctx.reply('Wait a second...');
 
     this.queue.push({
-      url, message_id: waitMessage.message_id, reply_to_message_id: ctx.message.message_id, chatId: ctx.chat.id,
+      url,
+      message_id: waitMessage.message_id,
+      reply_to_message_id: ctx.message.message_id,
+      chatId: ctx.chat.id,
     });
 
     redisClient.set('queue', this.queue);
@@ -91,7 +93,7 @@ class RealsVideoProcessor {
           url, message_id, reply_to_message_id, chatId,
         } = video;
 
-        const videoUrl = processUrl(url);// await extractVideoUrlFromInstagramReals(url);
+        const videoUrl = processUrl(url); // await extractVideoUrlFromInstagramReals(url);
         logger.info(`Video URL: ${videoUrl}`);
         if (!videoUrl.startsWith('blob')) {
           if (ctx.replyWithVideo) {
@@ -127,7 +129,7 @@ class RealsVideoProcessor {
   }
 
   async init(ctx) {
-    this.queue = await redisClient.get('queue') || [];
+    this.queue = (await redisClient.get('queue')) || [];
     this.processVideoQueue(ctx);
   }
 }
