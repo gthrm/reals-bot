@@ -40,8 +40,8 @@ function processUrl(url) {
     case url.includes('tiktok'):
       return url.replace('tiktok', 'tfxktok');
 
-    case url.includes('x.xom'):
-      return url.replace('x.xom', 'fxtwitter.com');
+    case url.includes('x.com'):
+      return url.replace('x.com', 'fxtwitter.com');
 
     default:
       return url;
