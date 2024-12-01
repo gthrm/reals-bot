@@ -34,7 +34,7 @@ function processUrl(url) {
   }
 
   if (url.includes('instagram')) {
-    return url.replace('instagram', 'ddinstagram');
+    return url.replace('instagram.com', process.env.INSTAGRAM_DOMAIN);
   }
 
   if (url.includes('tiktok')) {
