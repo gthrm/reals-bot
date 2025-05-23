@@ -33,8 +33,8 @@ function processUrl(url) {
     return null;
   }
 
-  if (url.includes('instagram')) {
-    return url.replace('instagram.com', process.env.INSTAGRAM_DOMAIN);
+  if (url.includes('www.instagram')) {
+    return url.replace('www.instagram.com', process.env.INSTAGRAM_DOMAIN);
   }
 
   if (url.includes('tiktok')) {
