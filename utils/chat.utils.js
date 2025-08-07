@@ -47,7 +47,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
     messages: [{ role: 'system', content: angryPrompt }, { role: 'system', content: prompt }, ...userMessages],
     // temperature: 0.2,
     // max_tokens: 256,
-    temperature: 0.8,
+    temperature: 1,
     ...(process.env.MODEL_NAME !== "gpt-5" && { max_tokens: 2000 }),
     ...(process.env.MODEL_NAME === "gpt-5" && { max_completion_tokens: 2000 }),
     frequency_penalty: 0.5,
