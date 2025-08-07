@@ -51,7 +51,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
     ...(process.env.MODEL_NAME !== "gpt-5" && { max_tokens: 2000 }),
     ...(process.env.MODEL_NAME === "gpt-5" && { max_completion_tokens: 2000 }),
     frequency_penalty: 0.5,
-    presence_penalty: 0.5,
+    // presence_penalty: 0.5,
     // stop: ['\n', '```'],
   });
 
