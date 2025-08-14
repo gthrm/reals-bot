@@ -50,7 +50,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
     // model: 'gpt-4-turbo-2024-04-09',
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'system', content: prompt },
+      // { role: 'system', content: prompt },
       ...userMessages,
     ],
     // temperature: 0.2,
