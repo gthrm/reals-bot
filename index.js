@@ -23,22 +23,27 @@ bot.launch();
 
 bot.use((ctx, next) => {
   const {
-    text, chat, from, reply_to_message,
+    text, caption, chat, from, reply_to_message, photo, voice, audio,
   } = ctx?.message || {};
 
   if (!from?.is_bot) {
+    // Check for URL in text
     if (text && isAvailableUrl(text)) {
       return next();
     }
 
-    if (text && text.includes(`@${process.env.BOT_USERNAME}`)) {
+    // Check for bot mention in text or caption
+    const messageText = text || caption || '';
+    if (messageText && messageText.includes(`@${process.env.BOT_USERNAME}`)) {
       return next();
     }
 
+    // Check for reply to bot message
     if (reply_to_message && reply_to_message.from?.username === process.env.BOT_USERNAME) {
       return next();
     }
 
+    // Allow private chats
     if (chat?.type === 'private') {
       return next();
     }
@@ -68,7 +73,7 @@ const realsVideoProcessor = new RealsVideoProcessor(bot.telegram);
 
 bot.on('text', async (ctx) => {
   const {
-    text, chat, message_id,
+    text, chat, message_id, reply_to_message,
   } = ctx.message;
   try {
     const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
@@ -82,13 +87,48 @@ bot.on('text', async (ctx) => {
       }
     } else if (IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`)) {
       try {
-        const answerData = await getAnswer(chat.id, text);
+        const answerData = await getAnswer(chat.id, text, reply_to_message, bot);
         if (answerData?.message?.content) {
           await ctx.reply(answerData.message.content, { reply_to_message_id: message_id });
         }
       } catch (error) {
         logger.error(error);
         await ctx.reply('Something went wrong! Please try again!');
+      }
+    }
+  } catch (error) {
+    logger.error(error);
+    await ctx.reply('Something went wrong! Please try again!');
+  }
+});
+
+// Handle photo messages
+bot.on('photo', async (ctx) => {
+  const {
+    caption, chat, message_id, photo,
+  } = ctx.message;
+  
+  try {
+    const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
+    
+    // Check if bot is mentioned in caption
+    if (caption && caption.includes(`@${process.env.BOT_USERNAME}`) && IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`)) {
+      try {
+        // Analyze the photo
+        const photoFileId = photo[photo.length - 1].file_id;
+        const { analyzeImage } = require('./utils/chat.utils');
+        const imageAnalysis = await analyzeImage(bot, photoFileId);
+        
+        // Prepare message with photo analysis
+        const messageText = caption ? `${caption}\n\n[Photo analysis: ${imageAnalysis}]` : `[Photo analysis: ${imageAnalysis}]`;
+        
+        const answerData = await getAnswer(chat.id, messageText, null, bot);
+        if (answerData?.message?.content) {
+          await ctx.reply(answerData.message.content, { reply_to_message_id: message_id });
+        }
+      } catch (error) {
+        logger.error(error);
+        await ctx.reply('Something went wrong analyzing the photo!');
       }
     }
   } catch (error) {
