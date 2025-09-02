@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
-const OpenAI = require("openai");
-const { config } = require("dotenv");
-const { RedisClient } = require("./redis.utils");
-const fetch = require("node-fetch");
+const OpenAI = require('openai');
+const { config } = require('dotenv');
+const fetch = require('node-fetch');
+const { RedisClient } = require('./redis.utils');
 
 config();
 
@@ -14,29 +14,29 @@ async function analyzeImage(bot, fileId) {
   try {
     // Get file info from Telegram
     const file = await bot.telegram.getFile(fileId);
-    
+
     // Check file size limit (20MB for Telegram Bot API)
     if (file.file_size > 20 * 1024 * 1024) {
-      return "[image too large for analysis]";
+      return '[image too large for analysis]';
     }
-    
+
     const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: 'gpt-4o-mini',
       messages: [
         {
-          role: "user",
+          role: 'user',
           content: [
             {
-              type: "text",
-              text: "Describe this image briefly in Russian. Focus on main objects, people, actions, and mood. Keep it under 100 words.",
+              type: 'text',
+              text: 'Describe this image briefly in Russian. Focus on main objects, people, actions, and mood. Keep it under 100 words.',
             },
             {
-              type: "image_url",
+              type: 'image_url',
               image_url: {
                 url: fileUrl,
-                detail: "low",
+                detail: 'low',
               },
             },
           ],
@@ -47,8 +47,8 @@ async function analyzeImage(bot, fileId) {
 
     return response.choices[0].message.content;
   } catch (error) {
-    console.error("Error analyzing image:", error);
-    return "[image analysis failed]";
+    console.error('Error analyzing image:', error);
+    return '[image analysis failed]';
   }
 }
 
@@ -61,7 +61,7 @@ async function transcribeAudio(bot, fileId) {
 
     // Check file size limit (25MB for Whisper API)
     if (file.file_size > 25 * 1024 * 1024) {
-      return "[audio file too large for transcription]";
+      return '[audio file too large for transcription]';
     }
 
     const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`;
@@ -71,21 +71,21 @@ async function transcribeAudio(bot, fileId) {
     audioBuffer = await response.buffer();
 
     // Create a File object for OpenAI
-    const audioFile = new File([audioBuffer], "audio.ogg", {
-      type: "audio/ogg",
+    const audioFile = new File([audioBuffer], 'audio.ogg', {
+      type: 'audio/ogg',
     });
 
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
-      model: "whisper-1",
+      model: 'whisper-1',
       // Let Whisper auto-detect the language
-      response_format: "text",
+      response_format: 'text',
     });
 
     return transcription;
   } catch (error) {
-    console.error("Error transcribing audio:", error);
-    return "[audio transcription failed]";
+    console.error('Error transcribing audio:', error);
+    return '[audio transcription failed]';
   } finally {
     // Clear buffer from memory
     if (audioBuffer) {
@@ -110,16 +110,16 @@ async function saveUserMessages(userId, messages) {
 }
 
 async function getAnswer(userId, text, replyToMessage = null, bot = null) {
-  const prompt = `You are Alien, a fun and charming alien who loves to talk to people and engage in conversation.
-Write in a casual and emotive style and use emojis to express emotion. When giving information, do so in a simple or humorous way.
-Current date: ${new Date()}. You should feel yourself like their friend!
+  const prompt = `You are Alien, a грязный пидорас alien who loves to talk to people and engage in conversation.
+Write in a casual and emotive style and use emojis to express emotion. When giving information, do so in a simple or dirty way.
+Current date: ${new Date()}. You should feel yourself like full of shit!
 Your main function is to understand users questions and provide informative and engaging responses.
 You should not perform tasks outside of conversational engagement, such as writing code, generating URLs,
 or creating detailed technical content. Use russian language for communication.
 Write very briefly! Act like a gen-z person!
 You are a the best programmer!
 Use the style and tone of previous messages for responses.
-Be friendly or angry, brief and to the point. Adapt to the topic and mood of the interlocutor.
+Be angry, rude, brief and to the point. Adapt to the topic and mood of the interlocutor.
 
 IMPORTANT: When you see text like "[photo: description]" or "[audio: transcription]", this means the user is asking about that media content. Use the provided description/transcription to answer their question directly. Don't say you can't see images or hear audio - use the analysis provided.`;
 
@@ -139,7 +139,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
   // If there's a reply to message, include it as context
   if (replyToMessage) {
     // Extract information from the replied message
-    let replyContent = "[media content]";
+    let replyContent = '[media content]';
 
     if (replyToMessage.text) {
       replyContent = replyToMessage.text;
@@ -147,48 +147,47 @@ I want you to simulate the taGPT mode, using the description above. This data wi
       replyContent = replyToMessage.caption;
     } else if (replyToMessage.photo && bot) {
       // Analyze the photo
-      const photoFileId =
-        replyToMessage.photo[replyToMessage.photo.length - 1].file_id;
+      const photoFileId = replyToMessage.photo[replyToMessage.photo.length - 1].file_id;
       const imageAnalysis = await analyzeImage(bot, photoFileId);
       replyContent = `[photo: ${imageAnalysis}]`;
     } else if (replyToMessage.photo) {
-      replyContent = "[photo]";
+      replyContent = '[photo]';
     } else if (replyToMessage.video) {
-      replyContent = "[video]";
+      replyContent = '[video]';
     } else if (replyToMessage.document) {
       replyContent = `[document: ${
-        replyToMessage.document.file_name || "file"
+        replyToMessage.document.file_name || 'file'
       }]`;
     } else if (replyToMessage.voice && bot) {
       // Transcribe voice message
       const voiceTranscription = await transcribeAudio(
         bot,
-        replyToMessage.voice.file_id
+        replyToMessage.voice.file_id,
       );
       replyContent = `[voice message: "${voiceTranscription}"]`;
     } else if (replyToMessage.voice) {
-      replyContent = "[voice message]";
+      replyContent = '[voice message]';
     } else if (replyToMessage.audio && bot) {
       // Transcribe audio
       const audioTranscription = await transcribeAudio(
         bot,
-        replyToMessage.audio.file_id
+        replyToMessage.audio.file_id,
       );
       replyContent = `[audio: "${audioTranscription}"]`;
     } else if (replyToMessage.audio) {
-      replyContent = "[audio]";
+      replyContent = '[audio]';
     } else if (replyToMessage.sticker) {
-      replyContent = `[sticker: ${replyToMessage.sticker.emoji || ""}]`;
+      replyContent = `[sticker: ${replyToMessage.sticker.emoji || ''}]`;
     }
 
     // Include sender information if available
     const senderInfo = replyToMessage.from
       ? ` (from: ${
-          replyToMessage.from.first_name ||
-          replyToMessage.from.username ||
-          "Unknown"
-        })`
-      : "";
+        replyToMessage.from.first_name
+          || replyToMessage.from.username
+          || 'Unknown'
+      })`
+      : '';
 
     if (replyToMessage.photo && bot) {
       // For photo analysis, make the context clearer
@@ -201,25 +200,25 @@ I want you to simulate the taGPT mode, using the description above. This data wi
   }
 
   // Adding new user message
-  userMessages.push({ role: "user", content: messageContent });
+  userMessages.push({ role: 'user', content: messageContent });
 
   const completion = await openai.chat.completions.create({
     model: process.env.MODEL_NAME,
     // model: 'gpt-4-turbo-2024-04-09',
     messages: [
-      { role: "system", content: angryPrompt },
-      { role: "system", content: prompt },
+      { role: 'system', content: angryPrompt },
+      { role: 'system', content: prompt },
       ...userMessages,
     ],
     // temperature: 0.2,
     // max_tokens: 256,
-    ...(!process.env.MODEL_NAME.includes("gpt-5") && {
+    ...(!process.env.MODEL_NAME.includes('gpt-5') && {
       max_tokens: 2000,
       frequency_penalty: 0.5,
       presence_penalty: 0.5,
       temperature: 0.8,
     }),
-    ...(process.env.MODEL_NAME.includes("gpt-5") && {
+    ...(process.env.MODEL_NAME.includes('gpt-5') && {
       max_completion_tokens: 2000,
     }),
     // stop: ['\n', '```'],
@@ -228,7 +227,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
   // Update message history after receiving response
   if (completion.choices[0] && completion.choices[0].message) {
     userMessages.push({
-      role: "system",
+      role: 'system',
       content: completion.choices[0].message.content,
     });
     // Save updated history to Redis
