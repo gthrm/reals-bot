@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedoAI Bot - Искусственный интеллект в Telegram</title>
+    <meta name="description"
+        content="FedoAI Bot - умный Telegram бот с ИИ. Отвечает на вопросы, анализирует изображения, распознает речь и обрабатывает видео из соцсетей.">
+    <meta name="keywords"
+        content="telegram bot, искусственный интеллект, ИИ, AI, анализ изображений, распознавание речи, обработка видео, instagram, tiktok, twitter, fedorcoins, федоркоины">
+    <meta name="author" content="FedoAI Bot">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="ru">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="general">
+    <meta name="distribution" content="global">
+    <meta name="geo.region" content="RU">
+    <meta name="geo.placename" content="Russia">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="msapplication-TileColor" content="#6366f1">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fedoai.ru/">
+    <meta property="og:title" content="FedoAI Bot - Искусственный интеллект в Telegram">
+    <meta property="og:description"
+        content="Умный Telegram бот с ИИ. Отвечает на вопросы, анализирует изображения, распознает речь и обрабатывает видео из соцсетей.">
+    <meta property="og:image" content="https://fedoai.ru/og-image.jpg">
+    <meta property="og:site_name" content="FedoAI Bot">
+    <meta property="og:locale" content="ru_RU">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://fedoai.ru/">
+    <meta property="twitter:title" content="FedoAI Bot - Искусственный интеллект в Telegram">
+    <meta property="twitter:description"
+        content="Умный Telegram бот с ИИ. Отвечает на вопросы, анализирует изображения, распознает речь и обрабатывает видео из соцсетей.">
+    <meta property="twitter:image" content="https://fedoai.ru/og-image.jpg">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://fedoai.ru/">
+
+    <!-- Language -->
+    <link rel="alternate" hreflang="ru" href="https://fedoai.ru/">
+    <link rel="alternate" hreflang="x-default" href="https://fedoai.ru/">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "FedoAI Bot",
+      "description": "Умный Telegram бот с искусственным интеллектом для анализа текста, изображений, аудио и видео",
+      "url": "https://fedoai.ru",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Telegram",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "RUB",
+        "description": "Бесплатные лимиты: 10 текстов, 3 картинки, 3 аудио. ФедорКоины: 1 рубль = 1 ФК"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "FedoAI",
+        "url": "https://fedoai.ru"
+      },
+      "featureList": [
+        "Анализ изображений",
+        "Распознавание речи", 
+        "Обработка видео",
+        "Ответы на вопросы",
+        "Система ФедорКоинов"
+      ]
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Как работает оплата в FedoAI Bot?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "У нас есть бесплатные лимиты: 10 текстов, 3 картинки, 3 аудио. Дополнительно можно пополнять баланс ФедорКоинами: 1 рубль = 1 ФК. Текстовые запросы стоят 0.5 ФК, анализ изображений от 1 ФК."
+          }
+        },
+        {
+          "@type": "Question", 
+          "name": "Какие возможности у FedoAI Bot?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FedoAI Bot умеет отвечать на текстовые вопросы, анализировать изображения и GIF, распознавать речь в аудио сообщениях, обрабатывать видео из Instagram, TikTok, X (Twitter)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Как начать использовать FedoAI Bot?",
+          "acceptedAnswer": {
+            "@type": "Answer", 
+            "text": "Просто найдите @fedoai_bot в Telegram и нажмите /start. В приватном чате просто отправляйте сообщения, картинки или аудио. В группах упоминайте бота."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --dark: #1f2937;
+            --darker: #111827;
+            --light: #f8fafc;
+            --gray: #6b7280;
+            --gray-light: #e5e7eb;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --gradient-dark: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--gray-light);
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .cta-button {
+            background: var(--gradient);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="100%" stop-color="%23ffffff" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="800" cy="300" r="150" fill="url(%23a)"/><circle cx="400" cy="700" r="120" fill="url(%23a)"/><circle cx="900" cy="800" r="80" fill="url(%23a)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-text .highlight {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--white);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            padding: 1rem 2rem;
+            border: 2px solid var(--white);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bot-mockup {
+            width: 325px;
+            height: 600px;
+            background: var(--white);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bot-mockup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 62px;
+            background: var(--gradient);
+            border-radius: 30px 30px 0 0;
+        }
+
+        .bot-header {
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .bot-header h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .bot-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            max-width: 80%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: var(--white);
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: var(--gray-light);
+            color: var(--dark);
+            align-self: flex-start;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            background: var(--light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-light);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--white);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 6rem 0;
+            background: var(--white);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            border: 2px solid var(--gray-light);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient);
+            color: var(--white);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-period {
+            color: var(--gray);
+            margin-bottom: 2rem;
+            font-size: 0.8rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            padding: 0.5rem 0;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .pricing-features li i {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 6rem 0;
+            background: var(--gradient-dark);
+            color: var(--white);
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-info h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info p {
+            font-size: 1.125rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .contact-item a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-item a:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        .contact-item i {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .contact-form {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--white);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--darker);
+            color: var(--white);
+            padding: 3rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .footer-section a {
+            color: var(--accent);
+            text-decoration: none;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .footer-bottom a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-bottom a:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .bot-mockup {
+                width: 250px;
+                height: 500px;
+            }
+
+            .contact-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .pricing-card.featured:hover {
+                transform: translateY(-5px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+
+            .section-header h2 {
+                font-size: 2rem;
+            }
+
+            .bot-mockup {
+                width: 200px;
+                height: 400px;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Success/Error Messages */
+        .message-success {
+            background: var(--success);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message-error {
+            background: var(--error);
+            color: var(--white);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        <nav class="nav">
+            <a href="#" class="logo">
+                <i class="fas fa-robot"></i>
+                FedoAI Bot
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Возможности</a></li>
+                <li><a href="#pricing">Тарифы</a></li>
+                <li><a href="#contact">Контакты</a></li>
+            </ul>
+            <a href="https://t.me/fedoai_bot" class="cta-button" target="_blank">
+                <i class="fab fa-telegram"></i>
+                Попробовать
+            </a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" itemscope itemtype="https://schema.org/SoftwareApplication">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 itemprop="name">
+                    Искусственный интеллект<br>
+                    <span class="highlight">в Telegram</span>
+                </h1>
+                <p itemprop="description">
+                    FedoAI Bot - это умный помощник, который отвечает на вопросы,
+                    анализирует изображения, распознает речь и обрабатывает видео
+                    из социальных сетей прямо в Telegram.
+                </p>
+                <div class="hero-buttons">
+                    <a href="https://t.me/fedoai_bot" class="btn-primary" target="_blank"
+                        aria-label="Начать общение с FedoAI Bot в Telegram">
+                        <i class="fab fa-telegram" aria-hidden="true"></i>
+                        Начать общение
+                    </a>
+                    <a href="#features" class="btn-secondary" aria-label="Узнать больше о возможностях бота">
+                        <i class="fas fa-play" aria-hidden="true"></i>
+                        Узнать больше
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="bot-mockup">
+                    <div class="bot-header">
+                        <h3>FedoAI Bot</h3>
+                        <p>онлайн</p>
+                    </div>
+                    <div class="bot-messages">
+                        <div class="message user">Привет! Расскажи о себе</div>
+                        <div class="message bot">Привет! Я FedoAI Bot - ваш умный помощник в Telegram. Я умею отвечать
+                            на вопросы, анализировать изображения и многое другое!</div>
+                        <div class="message user">Как работает оплата?</div>
+                        <div class="message bot">У нас есть бесплатные лимиты и система ФедорКоинов. 1 рубль = 1 ФК.
+                            Тексты стоят 0.5 ФК, медиа от 1 ФК.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Возможности FedoAI Bot</h2>
+                <p>FedoAI Bot предоставляет широкий спектр AI-функций для решения ваших задач в Telegram</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Текстовые ответы</h3>
+                    <p>Отвечает на любые вопросы с помощью передовых языковых моделей. Понимает контекст и ведет
+                        естественную беседу.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3>Анализ изображений</h3>
+                    <p>Анализирует фотографии и GIF-анимации. Описывает содержимое, отвечает на вопросы по изображениям.
+                    </p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <h3>Распознавание речи</h3>
+                    <p>Преобразует голосовые и аудио сообщения в текст, а затем обрабатывает их с помощью ИИ.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Обработка видео</h3>
+                    <p>Скачивает и обрабатывает видео из Instagram, TikTok, X (Twitter) и других популярных платформ.
+                    </p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h3>Система оплаты</h3>
+                    <p>Удобная система ФедорКоинов с бесплатными лимитами и гибкой тарификацией за использование.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Безопасность</h3>
+                    <p>Защита данных пользователей, безопасные платежи через Cardlink и надежное хранение информации.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Тарифы и цены</h2>
+                <p>Гибкая система оплаты с бесплатными лимитами</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card fade-in">
+                    <h3>Бесплатно</h3>
+                    <div class="pricing-price">0₽</div>
+                    <div class="pricing-period">навсегда</div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> 10 текстовых запросов</li>
+                        <li><i class="fas fa-check"></i> 3 анализа изображений</li>
+                        <li><i class="fas fa-check"></i> 3 распознавания аудио</li>
+                        <li><i class="fas fa-check"></i> Базовая поддержка</li>
+                    </ul>
+                    <a href="https://t.me/fedoai_bot" class="btn-secondary" target="_blank">Начать бесплатно</a>
+                </div>
+                <div class="pricing-card featured fade-in">
+                    <div class="pricing-badge">Популярный</div>
+                    <h3>ФедорКоины</h3>
+                    <div class="pricing-price">100₽</div>
+                    <div class="pricing-period">за 100 ФК</div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Текстовые запросы: 0.5 ФК</li>
+                        <li><i class="fas fa-check"></i> Анализ изображений: от 1 ФК</li>
+                        <li><i class="fas fa-check"></i> Распознавание аудио: от 0.5 ФК</li>
+                        <li><i class="fas fa-check"></i> Обработка видео: от 1 ФК</li>
+                        <li><i class="fas fa-check"></i> Приоритетная поддержка</li>
+                        <li><i class="fas fa-check"></i> Детальная статистика</li>
+                    </ul>
+                    <a href="https://t.me/fedoai_bot" class="btn-primary" target="_blank">Пополнить баланс</a>
+                </div>
+                <div class="pricing-card fade-in">
+                    <h3>Корпоративный</h3>
+                    <div class="pricing-price">По запросу</div>
+                    <div class="pricing-period">индивидуально</div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Персональные лимиты</li>
+                        <li><i class="fas fa-check"></i> API доступ</li>
+                        <li><i class="fas fa-check"></i> Белый лейбл</li>
+                        <li><i class="fas fa-check"></i> 24/7 поддержка</li>
+                        <li><i class="fas fa-check"></i> Аналитика и отчеты</li>
+                    </ul>
+                    <a href="#contact" class="btn-secondary">Связаться с нами</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h2>Свяжитесь с нами</h2>
+                    <p>
+                        Есть вопросы? Хотите предложить улучшения или сообщить об ошибке?
+                        Мы всегда рады обратной связи от наших пользователей!
+                    </p>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="fab fa-telegram"></i>
+                            <div>
+                                <h4>Telegram</h4>
+                                <p>@fedoai_bot</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <p>support@fedoai.ru</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-globe"></i>
+                            <div>
+                                <h4>Сайт</h4>
+                                <p><a href="https://fedoai.ru" target="_blank">fedoai.ru</a></p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>Время работы</h4>
+                                <p>24/7 - бот работает круглосуточно</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm" action="https://formspree.io/f/myznjazg" method="POST">
+                        <div id="successMessage" class="message-success">
+                            <i class="fas fa-check-circle"></i>
+                            Спасибо! Ваше сообщение отправлено. Мы свяжемся с вами в ближайшее время.
+                        </div>
+                        <div id="errorMessage" class="message-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Произошла ошибка при отправке сообщения. Попробуйте еще раз.
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name">Имя *</label>
+                            <input type="text" id="name" name="name" required placeholder="Ваше имя">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required placeholder="your@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Тема</label>
+                            <input type="text" id="subject" name="subject" placeholder="Тема сообщения">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Сообщение *</label>
+                            <textarea id="message" name="message" required
+                                placeholder="Расскажите, чем можем помочь..."></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span id="btnText">Отправить сообщение</span>
+                            <span id="btnLoading" class="loading" style="display: none;"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>FedoAI Bot</h3>
+                    <p>Умный помощник с искусственным интеллектом для Telegram. Отвечает на вопросы, анализирует
+                        изображения и обрабатывает медиа-контент.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Возможности</h3>
+                    <p><a href="#features">Текстовые ответы</a></p>
+                    <p><a href="#features">Анализ изображений</a></p>
+                    <p><a href="#features">Распознавание речи</a></p>
+                    <p><a href="#features">Обработка видео</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Поддержка</h3>
+                    <p><a href="https://t.me/fedoai_bot" target="_blank">Telegram бот</a></p>
+                    <p><a href="#contact">Обратная связь</a></p>
+                    <p><a href="#pricing">Тарифы</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Контакты</h3>
+                    <p>Telegram: @fedoai_bot</p>
+                    <p>Email: support@fedoai.ru</p>
+                    <p>Сайт: <a href="https://fedoai.ru" target="_blank">fedoai.ru</a></p>
+                    <p>Работаем 24/7</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 FedoAI Bot. Все права защищены. | <a href="privacy.html">Политика конфиденциальности</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Contact form handling
+        const contactForm = document.getElementById('contactForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoading = document.getElementById('btnLoading');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Show loading state
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-block';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            try {
+                const formData = new FormData(contactForm);
+
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    successMessage.style.display = 'block';
+                    contactForm.reset();
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.style.display = 'block';
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        });
+
+        // Add some interactive animations
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Bot mockup message animation
+        const messages = document.querySelectorAll('.message');
+        messages.forEach((message, index) => {
+            message.style.animationDelay = `${index * 0.5}s`;
+        });
+
+        // Add typing indicator to bot mockup
+        setTimeout(() => {
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message bot';
+            typingIndicator.innerHTML = '<i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i>';
+            typingIndicator.style.fontSize = '0.8rem';
+            typingIndicator.style.opacity = '0.7';
+
+            const botMessages = document.querySelector('.bot-messages');
+            botMessages.appendChild(typingIndicator);
+
+            setTimeout(() => {
+                typingIndicator.remove();
+            }, 2000);
+        }, 3000);
+    </script>
+</body>
+
+</html>
