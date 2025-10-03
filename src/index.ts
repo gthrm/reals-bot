@@ -16,10 +16,13 @@ const dbClient = new DatabaseClient();
 const usageService = new UsageService();
 const paymentService = new PaymentService();
 
-// Initialize connections
+// Initialize connections and setup bot
 async function initializeServices() {
   await redisClient.init();
   await dbClient.init();
+
+  // Automatically setup bot commands on every start
+  await setupBotCommands();
 }
 
 initializeServices().catch(console.error);
@@ -44,26 +47,53 @@ function isAvailableUrl(url: string): boolean {
 // Настройка команд для меню бота
 async function setupBotCommands() {
   try {
-    await bot.telegram.setMyCommands([
-      { command: 'start', description: '🚀 Запустить бота' },
-      { command: 'balance', description: '💰 Проверить баланс и лимиты' },
-      { command: 'stats', description: '📊 Детальная статистика использования' },
-      { command: 'topup', description: '💳 Пополнить баланс ФедорКоинами' },
-      { command: 'help', description: '❓ Помощь и инструкции' },
-      { command: 'stoptalking', description: '🔇 Отключить бота в чате' },
-      { command: 'starttalking', description: '🔊 Включить бота в чате' },
-    ]);
-    logger.info('Bot commands menu configured');
+    logger.info("Setting up bot commands menu...");
+
+    const commands = [
+      { command: "start", description: "🚀 Запустить бота" },
+      { command: "balance", description: "💰 Проверить баланс и лимиты" },
+      {
+        command: "stats",
+        description: "📊 Детальная статистика использования",
+      },
+      { command: "topup", description: "💳 Пополнить баланс ФедорКоинами" },
+      { command: "help", description: "❓ Помощь и инструкции" },
+      { command: "stoptalking", description: "🔇 Отключить бота в чате" },
+      { command: "starttalking", description: "🔊 Включить бота в чате" },
+    ];
+
+    await bot.telegram.setMyCommands(commands);
+    logger.info("✅ Bot commands menu configured successfully", {
+      commandsCount: commands.length,
+    });
   } catch (error) {
-    logger.error('Error setting bot commands', error);
+    logger.error("❌ Error setting bot commands", error);
   }
 }
 
-bot.launch().then(() => {
-  setupBotCommands();
-});
+bot.launch();
 
-bot.use((ctx: Context, next) => {
+// Единый middleware для создания пользователей и фильтрации
+bot.use(async (ctx: Context, next) => {
+  // Создаем пользователя при любом взаимодействии
+  if (ctx.from && !ctx.from.is_bot) {
+    try {
+      const userData = {
+        username: ctx.from.username,
+        firstName: ctx.from.first_name,
+        lastName: ctx.from.last_name,
+      };
+      await usageService.ensureUser(ctx.from.id, userData);
+    } catch (error) {
+      logger.error("Error ensuring user exists", error);
+    }
+  }
+
+  // Пропускаем команды и callback_query без дополнительных проверок
+  if (ctx.callbackQuery || (ctx.message as any)?.text?.startsWith('/')) {
+    return next();
+  }
+
   const message = ctx.message as any;
   if (!message) return;
 
@@ -137,9 +167,7 @@ bot.command("balance", async (ctx) => {
       const formattedInfo = usageService.formatUserInfo(userInfo);
       await ctx.reply(formattedInfo, { parse_mode: "Markdown" });
     } else {
-      await ctx.reply(
-        "Пользователь не найден. Отправьте любое сообщение для регистрации."
-      );
+      await ctx.reply("Произошла ошибка при получении баланса.");
     }
   } catch (error) {
     logger.error("Error in balance command", error);
@@ -199,15 +227,31 @@ bot.command("topup", async (ctx) => {
       await ctx.reply(
         `💳 **Пополнение баланса**
 
-Использование: \`/topup <сумма>\`
-Пример: \`/topup 500\`
-
 💰 Курс: 1 рубль = 1 ФедорКоин
 💸 Минимальная сумма: 100 рублей
 🔄 Комиссию платит плательщик
 
-Введите команду с суммой для создания счета на оплату.`,
-        { parse_mode: "Markdown" }
+Выберите сумму для пополнения:`,
+        {
+          parse_mode: "Markdown",
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: "💰 100 руб", callback_data: "topup_100" },
+                { text: "💰 200 руб", callback_data: "topup_200" },
+              ],
+              [
+                { text: "💰 500 руб", callback_data: "topup_500" },
+                { text: "💰 1000 руб", callback_data: "topup_1000" },
+              ],
+              [
+                { text: "💰 2000 руб", callback_data: "topup_2000" },
+                { text: "💰 5000 руб", callback_data: "topup_5000" },
+              ],
+              [{ text: "✏️ Другая сумма", callback_data: "topup_custom" }],
+            ],
+          },
+        }
       );
       return;
     }
@@ -258,6 +302,19 @@ bot.command("starttalking", async (ctx) => {
   });
 });
 
+// Команда для принудительной установки меню команд
+bot.command("setupmenu", async (ctx) => {
+  try {
+    await setupBotCommands();
+    await ctx.reply(
+      "✅ Меню команд обновлено! Перезапустите Telegram для применения изменений."
+    );
+  } catch (error) {
+    logger.error("Error in setupmenu command", error);
+    await ctx.reply("❌ Ошибка при установке меню команд.");
+  }
+});
+
 bot.help(async (ctx) => {
   const helpMessage = `❓ **Помощь FedoAI Bot**
 
@@ -270,7 +327,7 @@ bot.help(async (ctx) => {
 💰 **Система оплаты:**
 🆓 **Бесплатные лимиты:**
 • 10 текстовых запросов
-• 3 анализа картинок/GIF  
+• 3 анализа картинок/GIF
 • 3 распознавания аудио
 
 🪙 **ФедорКоины (1 руб = 1 ФК):**
@@ -293,6 +350,119 @@ bot.help(async (ctx) => {
 });
 
 const realsVideoProcessor = new RealsVideoProcessor(bot.telegram);
+
+// Обработка inline кнопок для пополнения
+bot.action(/^topup_(\d+)$/, async (ctx) => {
+  try {
+    logger.info("Topup button clicked", { data: (ctx.callbackQuery as any)?.data });
+
+    const amount = parseInt(ctx.match![1]);
+    const userId = ctx.from!.id;
+
+    // Проверяем есть ли переменные окружения для Cardlink
+    if (!process.env.CARDLINK_API_TOKEN || !process.env.CARDLINK_SHOP_ID) {
+      await ctx.answerCbQuery("❌ Платежная система не настроена");
+      await ctx.editMessageText(
+        `❌ **Платежная система временно недоступна**
+        
+Администратор должен настроить переменные окружения:
+- CARDLINK_API_TOKEN
+- CARDLINK_SHOP_ID
+
+Обратитесь в поддержку.`,
+        { parse_mode: "Markdown" }
+      );
+      return;
+    }
+
+    await ctx.answerCbQuery("💳 Создаю счет на оплату...");
+
+    // Создаем счет на оплату
+    const billResponse = await paymentService.createBill(userId, amount);
+    const message = paymentService.formatPaymentMessage(billResponse, amount);
+
+    await ctx.editMessageText(message, {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "🔗 Перейти к оплате", url: billResponse.link_page_url }],
+          [{ text: "🔙 Назад", callback_data: "topup_back" }],
+        ],
+      },
+    });
+
+    logger.info(
+      `Payment bill created via button for user ${userId}: ${amount} RUB`
+    );
+  } catch (error) {
+    logger.error("Error in topup button", error);
+    await ctx.answerCbQuery("❌ Ошибка создания счета");
+    await ctx.editMessageText(
+      `❌ **Ошибка создания счета**
+      
+Попробуйте позже или обратитесь в поддержку.
+Ошибка: ${error instanceof Error ? error.message : "Unknown error"}`,
+      { parse_mode: "Markdown" }
+    );
+  }
+});
+
+// Кнопка "Другая сумма"
+bot.action("topup_custom", async (ctx) => {
+  logger.info("Topup custom button clicked");
+  await ctx.answerCbQuery("✏️ Введите свою сумму");
+  await ctx.editMessageText(
+    `💳 **Пополнение баланса**
+
+Введите команду: \`/topup <сумма>\`
+Пример: \`/topup 750\`
+
+💰 Курс: 1 рубль = 1 ФедорКоин
+💸 Минимальная сумма: 100 рублей
+💸 Максимальная сумма: 50,000 рублей`,
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [[{ text: "🔙 Назад", callback_data: "topup_back" }]],
+      },
+    }
+  );
+});
+
+// Кнопка "Назад"
+bot.action("topup_back", async (ctx) => {
+  logger.info("Topup back button clicked");
+  await ctx.answerCbQuery("🔙 Возврат к выбору суммы");
+  await ctx.editMessageText(
+    `💳 **Пополнение баланса**
+
+💰 Курс: 1 рубль = 1 ФедорКоин
+💸 Минимальная сумма: 100 рублей
+🔄 Комиссию платит плательщик
+
+Выберите сумму для пополнения:`,
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "💰 100 руб", callback_data: "topup_100" },
+            { text: "💰 200 руб", callback_data: "topup_200" },
+          ],
+          [
+            { text: "💰 500 руб", callback_data: "topup_500" },
+            { text: "💰 1000 руб", callback_data: "topup_1000" },
+          ],
+          [
+            { text: "💰 2000 руб", callback_data: "topup_2000" },
+            { text: "💰 5000 руб", callback_data: "topup_5000" },
+          ],
+          [{ text: "✏️ Другая сумма", callback_data: "topup_custom" }],
+        ],
+      },
+    }
+  );
+});
 
 bot.on("text", async (ctx) => {
   const message = ctx.message as any;
@@ -736,7 +906,9 @@ bot.on("animation", async (ctx) => {
         if (answerData?.message?.content) {
           // В приватных чатах не отвечаем на сообщения, просто отправляем
           if (chat.type === "private") {
-            await ctx.reply(answerData.message.content, { parse_mode: "Markdown" });
+            await ctx.reply(answerData.message.content, {
+              parse_mode: "Markdown",
+            });
           } else {
             // В группах отвечаем на сообщение
             await ctx.reply(answerData.message.content, {
@@ -783,7 +955,9 @@ bot.on("video", async (ctx) => {
       if (answerData?.message?.content) {
         // В приватных чатах не отвечаем на сообщения, просто отправляем
         if (chat.type === "private") {
-          await ctx.reply(answerData.message.content, { parse_mode: "Markdown" });
+          await ctx.reply(answerData.message.content, {
+            parse_mode: "Markdown",
+          });
         } else {
           // В группах отвечаем на сообщение
           await ctx.reply(answerData.message.content, {
@@ -861,7 +1035,7 @@ app.post("/payment/success", async (req: Request, res: Response) => {
         <div class="info">Заказ: ${InvId}</div>
         <div class="info">Сумма: ${OutSum} ${CurrencyIn}</div>
         <div class="info">ФедорКоины зачислены на ваш баланс</div>
-        <a href="https://t.me/${process.env.BOT_USERNAME}" class="button">Вернуться к боту</a>
+        <a href="https://t.me/fedoai_bot" class="button">Вернуться к боту</a>
       </body>
       </html>
     `);
@@ -896,8 +1070,8 @@ app.post("/payment/fail", async (req: Request, res: Response) => {
         <div class="info">Заказ: ${InvId}</div>
         <div class="info">Сумма: ${OutSum} ${CurrencyIn}</div>
         <div class="info">Попробуйте еще раз или обратитесь в поддержку</div>
-        <a href="https://t.me/${process.env.BOT_USERNAME}" class="button">Вернуться к боту</a>
-        <a href="https://t.me/${process.env.BOT_USERNAME}" class="button retry">Попробовать снова</a>
+        <a href="https://t.me/fedoai_bot" class="button">Вернуться к боту</a>
+        <a href="https://t.me/fedoai_bot" class="button retry">Попробовать снова</a>
       </body>
       </html>
     `);
