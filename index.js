@@ -111,8 +111,13 @@ bot.on('photo', async (ctx) => {
   try {
     const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
     
-    // Check if bot is mentioned in caption
-    if (caption && caption.includes(`@${process.env.BOT_USERNAME}`) && IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`)) {
+    // Check conditions for photo analysis
+    const isPrivateChat = chat.type === 'private';
+    const isMentionedInGroup = caption && caption.includes(`@${process.env.BOT_USERNAME}`);
+    const shouldAnalyze = IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`) && 
+                         (isPrivateChat || isMentionedInGroup);
+    
+    if (shouldAnalyze) {
       try {
         // Analyze the photo
         const photoFileId = photo[photo.length - 1].file_id;
@@ -129,6 +134,80 @@ bot.on('photo', async (ctx) => {
       } catch (error) {
         logger.error(error);
         await ctx.reply('Something went wrong analyzing the photo!');
+      }
+    }
+  } catch (error) {
+    logger.error(error);
+    await ctx.reply('Something went wrong! Please try again!');
+  }
+});
+
+// Handle voice messages
+bot.on('voice', async (ctx) => {
+  const {
+    chat, message_id, voice,
+  } = ctx.message;
+  
+  try {
+    const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
+    
+    // Check conditions for voice analysis
+    const isPrivateChat = chat.type === 'private';
+    const shouldAnalyze = IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`) && isPrivateChat;
+    
+    if (shouldAnalyze) {
+      try {
+        // Transcribe the voice message
+        const { transcribeAudio } = require('./utils/chat.utils');
+        const transcription = await transcribeAudio(bot, voice.file_id);
+        
+        // Prepare message with transcription
+        const messageText = `[Voice message transcription: "${transcription}"]`;
+        
+        const answerData = await getAnswer(chat.id, messageText, null, bot);
+        if (answerData?.message?.content) {
+          await ctx.reply(answerData.message.content, { reply_to_message_id: message_id });
+        }
+      } catch (error) {
+        logger.error(error);
+        await ctx.reply('Something went wrong transcribing the voice message!');
+      }
+    }
+  } catch (error) {
+    logger.error(error);
+    await ctx.reply('Something went wrong! Please try again!');
+  }
+});
+
+// Handle audio messages
+bot.on('audio', async (ctx) => {
+  const {
+    chat, message_id, audio,
+  } = ctx.message;
+  
+  try {
+    const isMuted = await redisClient.get(`IS_MUTED_${chat.id}`);
+    
+    // Check conditions for audio analysis
+    const isPrivateChat = chat.type === 'private';
+    const shouldAnalyze = IS_ALIVE && !isMuted && process.env.LOCAL_CHAT_ID.includes(`${chat.id}`) && isPrivateChat;
+    
+    if (shouldAnalyze) {
+      try {
+        // Transcribe the audio message
+        const { transcribeAudio } = require('./utils/chat.utils');
+        const transcription = await transcribeAudio(bot, audio.file_id);
+        
+        // Prepare message with transcription
+        const messageText = `[Audio message transcription: "${transcription}"]`;
+        
+        const answerData = await getAnswer(chat.id, messageText, null, bot);
+        if (answerData?.message?.content) {
+          await ctx.reply(answerData.message.content, { reply_to_message_id: message_id });
+        }
+      } catch (error) {
+        logger.error(error);
+        await ctx.reply('Something went wrong transcribing the audio message!');
       }
     }
   } catch (error) {

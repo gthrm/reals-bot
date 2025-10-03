@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   BigInt        @id
+  username             String?       @db.VarChar(255)
+  firstName            String?       @map("first_name") @db.VarChar(255)
+  lastName             String?       @map("last_name") @db.VarChar(255)
+  fedorcoins           Decimal       @default(0.00) @db.Decimal(10, 2)
+  freeTextRequests     Int           @default(10) @map("free_text_requests")
+  freeImageRequests    Int           @default(3) @map("free_image_requests")
+  freeAudioRequests    Int           @default(3) @map("free_audio_requests")
+  totalTextRequests    Int           @default(0) @map("total_text_requests")
+  totalImageRequests   Int           @default(0) @map("total_image_requests")
+  totalAudioRequests   Int           @default(0) @map("total_audio_requests")
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  transactions         Transaction[]
+  payments            Payment[]
+  usageLogs           UsageLog[]
+
+  @@map("users")
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  userId      BigInt   @map("user_id")
+  type        String   @db.VarChar(50) // 'topup', 'text_request', 'image_request', 'audio_request'
+  amount      Decimal  @db.Decimal(10, 2)
+  description String?  @db.Text
+  paymentId   String?  @map("payment_id") @db.VarChar(255) // For Cardlink payments
+  status      String   @default("pending") @db.VarChar(50) // 'pending', 'completed', 'failed'
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("transactions")
+}
+
+model Payment {
+  id          Int       @id @default(autoincrement())
+  userId      BigInt    @map("user_id")
+  billId      String    @unique @map("bill_id") @db.VarChar(255)
+  amount      Decimal   @db.Decimal(10, 2)
+  status      String    @default("pending") @db.VarChar(50) // 'pending', 'success', 'failed'
+  paymentUrl  String?   @map("payment_url") @db.Text
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("payments")
+}
+
+model UsageLog {
+  id          Int      @id @default(autoincrement())
+  userId      BigInt   @map("user_id")
+  requestType String   @map("request_type") @db.VarChar(50) // 'text', 'image', 'audio'
+  cost        Decimal  @db.Decimal(10, 2)
+  duration    Int?     // For audio/video in seconds
+  fileSize    Int?     @map("file_size") // For media files in bytes
+  wasFree     Boolean  @default(false) @map("was_free")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([requestType])
+  @@index([createdAt])
+  @@map("usage_logs")
+}
