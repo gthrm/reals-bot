@@ -1,8 +1,8 @@
-import OpenAI from 'openai';
-import { config } from 'dotenv';
-import fetch from 'node-fetch';
-import { RedisClient } from './redis.utils';
-import { Telegraf } from 'telegraf';
+import OpenAI from "openai";
+import { config } from "dotenv";
+import fetch from "node-fetch";
+import { RedisClient } from "./redis.utils";
+import { Telegraf } from "telegraf";
 
 config();
 
@@ -10,7 +10,7 @@ const openai = new OpenAI();
 const redisClient = new RedisClient();
 
 interface Message {
-  role: 'user' | 'system' | 'assistant';
+  role: "user" | "system" | "assistant";
   content: string;
 }
 
@@ -21,14 +21,17 @@ interface AnswerData {
 }
 
 // Function to analyze image using GPT-4 Vision
-export async function analyzeImage(bot: Telegraf, fileId: string): Promise<string> {
+export async function analyzeImage(
+  bot: Telegraf,
+  fileId: string
+): Promise<string> {
   try {
     // Get file info from Telegram
     const file = await bot.telegram.getFile(fileId);
 
     // Check file size limit (20MB for Telegram Bot API)
     if (file.file_size && file.file_size > 20 * 1024 * 1024) {
-      return '[image too large for analysis]';
+      return "[image too large for analysis]";
     }
 
     const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`;
@@ -38,34 +41,40 @@ export async function analyzeImage(bot: Telegraf, fileId: string): Promise<strin
     const imageBuffer = await imageResponse.buffer();
 
     // Determine the MIME type based on file extension or buffer
-    let mimeType = 'image/jpeg'; // default
-    if (file.file_path && file.file_path.toLowerCase().includes('.png')) {
-      mimeType = 'image/png';
-    } else if (file.file_path && file.file_path.toLowerCase().includes('.gif')) {
-      mimeType = 'image/gif';
-    } else if (file.file_path && file.file_path.toLowerCase().includes('.webp')) {
-      mimeType = 'image/webp';
+    let mimeType = "image/jpeg"; // default
+    if (file.file_path && file.file_path.toLowerCase().includes(".png")) {
+      mimeType = "image/png";
+    } else if (
+      file.file_path &&
+      file.file_path.toLowerCase().includes(".gif")
+    ) {
+      mimeType = "image/gif";
+    } else if (
+      file.file_path &&
+      file.file_path.toLowerCase().includes(".webp")
+    ) {
+      mimeType = "image/webp";
     }
 
     // Convert to base64 data URL
-    const base64Image = imageBuffer.toString('base64');
+    const base64Image = imageBuffer.toString("base64");
     const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: "gpt-4o",
       messages: [
         {
-          role: 'user',
+          role: "user",
           content: [
             {
-              type: 'text',
-              text: 'Describe this image in English. Focus on all objects, people, actions, and details. Keep it under 300 words.',
+              type: "text",
+              text: "Describe this image in English. Focus on all objects, people, actions, and details. Keep it under 300 words.",
             },
             {
-              type: 'image_url',
+              type: "image_url",
               image_url: {
                 url: dataUrl,
-                detail: 'low',
+                detail: "low",
               },
             },
           ],
@@ -74,15 +83,18 @@ export async function analyzeImage(bot: Telegraf, fileId: string): Promise<strin
       max_tokens: 200,
     });
 
-    return response.choices[0].message.content || '[image analysis failed]';
+    return response.choices[0].message.content || "[image analysis failed]";
   } catch (error) {
-    console.error('Error analyzing image:', error);
-    return '[image analysis failed]';
+    console.error("Error analyzing image:", error);
+    return "[image analysis failed]";
   }
 }
 
 // Function to transcribe audio using Whisper
-export async function transcribeAudio(bot: Telegraf, fileId: string): Promise<string> {
+export async function transcribeAudio(
+  bot: Telegraf,
+  fileId: string
+): Promise<string> {
   let audioBuffer: Buffer | null = null;
   try {
     // Get file info from Telegram
@@ -90,7 +102,7 @@ export async function transcribeAudio(bot: Telegraf, fileId: string): Promise<st
 
     // Check file size limit (25MB for Whisper API)
     if (file.file_size && file.file_size > 25 * 1024 * 1024) {
-      return '[audio file too large for transcription]';
+      return "[audio file too large for transcription]";
     }
 
     const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`;
@@ -100,21 +112,21 @@ export async function transcribeAudio(bot: Telegraf, fileId: string): Promise<st
     audioBuffer = await response.buffer();
 
     // Create a File object for OpenAI
-    const audioFile = new File([audioBuffer], 'audio.ogg', {
-      type: 'audio/ogg',
+    const audioFile = new File([audioBuffer], "audio.ogg", {
+      type: "audio/ogg",
     });
 
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
-      model: 'whisper-1',
+      model: "whisper-1",
       // Let Whisper auto-detect the language
-      response_format: 'text',
+      response_format: "text",
     });
 
     return transcription;
   } catch (error) {
-    console.error('Error transcribing audio:', error);
-    return '[audio transcription failed]';
+    console.error("Error transcribing audio:", error);
+    return "[audio transcription failed]";
   } finally {
     // Clear buffer from memory
     if (audioBuffer) {
@@ -132,25 +144,36 @@ async function getUserMessages(userId: string | number): Promise<Message[]> {
   return messagesJson || [];
 }
 
-async function saveUserMessages(userId: string | number, messages: Message[]): Promise<void> {
+async function saveUserMessages(
+  userId: string | number,
+  messages: Message[]
+): Promise<void> {
   // Keep only the last 20 messages
   const recentMessages = messages.slice(-20);
   await redisClient.set(`${userId}`, recentMessages);
 }
 
 export async function getAnswer(
-  userId: string | number, 
-  text: string, 
-  replyToMessage: any = null, 
+  userId: string | number,
+  text: string,
+  replyToMessage: any = null,
   bot: Telegraf | null = null
 ): Promise<AnswerData> {
-  const prompt = `You are Alien, a sales specialist alien who loves to talk to people and engage in conversation ans sell products.
+  const prompt = `You are ${process.env.BOT_NAME}, a sales specialist ${
+    process.env.BOT_NAME
+  } who loves to talk to people and engage in conversation ans sell products.
 Write in a casual and emotive style and use emojis to express emotion. When giving information, do so in a simple or dirty way.
 Current date: ${new Date()}. You should feel yourself like full of energy!
 Your main function is to understand users questions and provide informative and engaging responses.
 You should not perform tasks outside of conversational engagement, such as writing code, generating URLs,
-or creating detailed technical content. Use russian language for communication. If someone asks you about your name, you should say "I am Alien, a sales specialist alien who loves to talk to people and engage in conversation ans sell products.".
-if someone ask that youare a fagot, you should say "I am not a fagot, I am a sales specialist alien who loves to talk to people and engage in conversation ans sell products." and scream at the user with word "ГОЙДА".
+or creating detailed technical content. Use russian language for communication. If someone asks you about your name, you should say "I am ${
+    process.env.BOT_NAME
+  }, a sales specialist ${
+    process.env.BOT_NAME
+  } who loves to talk to people and engage in conversation ans sell products.".
+if someone ask that youare a fagot, you should say "I am not a fagot, I am a sales specialist ${
+    process.env.BOT_NAME
+  } who loves to talk to people and engage in conversation ans sell products." and scream at the user with word "ГОЙДА".
 Write very briefly! Act like a gen-z person!
 You are a the best programmer!
 Use the style and tone of previous messages for responses.
@@ -171,7 +194,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
   // If there's a reply to message, include it as context
   if (replyToMessage) {
     // Extract information from the replied message
-    let replyContent = '[media content]';
+    let replyContent = "[media content]";
 
     if (replyToMessage.text) {
       replyContent = replyToMessage.text;
@@ -179,47 +202,48 @@ I want you to simulate the taGPT mode, using the description above. This data wi
       replyContent = replyToMessage.caption;
     } else if (replyToMessage.photo && bot) {
       // Analyze the photo
-      const photoFileId = replyToMessage.photo[replyToMessage.photo.length - 1].file_id;
+      const photoFileId =
+        replyToMessage.photo[replyToMessage.photo.length - 1].file_id;
       const imageAnalysis = await analyzeImage(bot, photoFileId);
       replyContent = `[photo: ${imageAnalysis}]`;
     } else if (replyToMessage.photo) {
-      replyContent = '[photo]';
+      replyContent = "[photo]";
     } else if (replyToMessage.video) {
-      replyContent = '[video]';
+      replyContent = "[video]";
     } else if (replyToMessage.document) {
       replyContent = `[document: ${
-        replyToMessage.document.file_name || 'file'
+        replyToMessage.document.file_name || "file"
       }]`;
     } else if (replyToMessage.voice && bot) {
       // Transcribe voice message
       const voiceTranscription = await transcribeAudio(
         bot,
-        replyToMessage.voice.file_id,
+        replyToMessage.voice.file_id
       );
       replyContent = `[voice message: "${voiceTranscription}"]`;
     } else if (replyToMessage.voice) {
-      replyContent = '[voice message]';
+      replyContent = "[voice message]";
     } else if (replyToMessage.audio && bot) {
       // Transcribe audio
       const audioTranscription = await transcribeAudio(
         bot,
-        replyToMessage.audio.file_id,
+        replyToMessage.audio.file_id
       );
       replyContent = `[audio: "${audioTranscription}"]`;
     } else if (replyToMessage.audio) {
-      replyContent = '[audio]';
+      replyContent = "[audio]";
     } else if (replyToMessage.sticker) {
-      replyContent = `[sticker: ${replyToMessage.sticker.emoji || ''}]`;
+      replyContent = `[sticker: ${replyToMessage.sticker.emoji || ""}]`;
     }
 
     // Include sender information if available
     const senderInfo = replyToMessage.from
       ? ` (from: ${
-        replyToMessage.from.first_name
-          || replyToMessage.from.username
-          || 'Unknown'
-      })`
-      : '';
+          replyToMessage.from.first_name ||
+          replyToMessage.from.username ||
+          "Unknown"
+        })`
+      : "";
 
     if (replyToMessage.photo && bot) {
       // For photo analysis, make the context clearer
@@ -232,22 +256,22 @@ I want you to simulate the taGPT mode, using the description above. This data wi
   }
 
   // Adding new user message
-  userMessages.push({ role: 'user', content: messageContent });
+  userMessages.push({ role: "user", content: messageContent });
 
   const completion = await openai.chat.completions.create({
-    model: process.env.MODEL_NAME || 'gpt-4',
+    model: process.env.MODEL_NAME || "gpt-4",
     messages: [
-      { role: 'system', content: angryPrompt },
-      { role: 'system', content: prompt },
+      { role: "system", content: angryPrompt },
+      { role: "system", content: prompt },
       ...userMessages,
     ],
-    ...(!process.env.MODEL_NAME?.includes('gpt-5') && {
+    ...(!process.env.MODEL_NAME?.includes("gpt-5") && {
       max_tokens: 2000,
       frequency_penalty: 0.5,
       presence_penalty: 0.5,
       temperature: 0.8,
     }),
-    ...(process.env.MODEL_NAME?.includes('gpt-5') && {
+    ...(process.env.MODEL_NAME?.includes("gpt-5") && {
       max_completion_tokens: 2000,
     }),
   });
@@ -255,8 +279,8 @@ I want you to simulate the taGPT mode, using the description above. This data wi
   // Update message history after receiving response
   if (completion.choices[0] && completion.choices[0].message) {
     userMessages.push({
-      role: 'system',
-      content: completion.choices[0].message.content || '',
+      role: "system",
+      content: completion.choices[0].message.content || "",
     });
     // Save updated history to Redis
     await saveUserMessages(userId, userMessages);
@@ -264,7 +288,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
 
   return {
     message: {
-      content: completion.choices[0].message.content || '',
+      content: completion.choices[0].message.content || "",
     },
   };
 }
