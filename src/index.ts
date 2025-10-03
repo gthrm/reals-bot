@@ -38,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 
 function isAvailableUrl(url: string): boolean {
   return (
-    url.startsWith("https://www.instagram.com/reel/") ||
+    url.startsWith("https://www.instagram.com/") ||
     url.startsWith("https://x.com/") ||
     url.startsWith("https://vt.tiktok.com/")
   );
