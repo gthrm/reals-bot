@@ -227,4 +227,71 @@ export class PaymentService {
 
 Спасибо за пополнение! Теперь вы можете использовать бота без ограничений.`;
   }
+
+  // Проверка подписи для refund/chargeback (другая формула)
+  private verifyRefundSignature(data: any): boolean {
+    try {
+      const { Amount, TrsId, SignatureValue } = data;
+      const expectedSignature = crypto
+        .createHash('md5')
+        .update(`${Amount}:${TrsId}:${this.apiToken}`)
+        .digest('hex')
+        .toUpperCase();
+
+      return SignatureValue === expectedSignature;
+    } catch (error) {
+      logger.error('Error verifying refund signature', error);
+      return false;
+    }
+  }
+
+  // Обработка refund webhook
+  async handleRefundWebhook(data: any): Promise<{ success: boolean; message: string }> {
+    try {
+      // Проверяем подпись
+      if (!this.verifyRefundSignature(data)) {
+        logger.error('Invalid signature in refund webhook', data);
+        return { success: false, message: 'Invalid signature' };
+      }
+
+      const { Id, Amount, Currency, Status, InvId, BillId, PaymentId } = data;
+
+      if (Status === "SUCCESS") {
+        // Обработка успешного возврата
+        logger.info(
+          `Refund processed: ${Id}, Amount: ${Amount} ${Currency}, Payment: ${PaymentId}`
+        );
+        // Здесь можно списать ФедорКоины у пользователя или заблокировать аккаунт
+      }
+
+      return { success: true, message: 'Refund processed' };
+    } catch (error) {
+      logger.error('Error handling refund webhook', error);
+      return { success: false, message: 'Internal error' };
+    }
+  }
+
+  // Обработка chargeback webhook
+  async handleChargebackWebhook(data: any): Promise<{ success: boolean; message: string }> {
+    try {
+      // Проверяем подпись (та же формула что и для refund)
+      if (!this.verifyRefundSignature(data)) {
+        logger.error('Invalid signature in chargeback webhook', data);
+        return { success: false, message: 'Invalid signature' };
+      }
+
+      const { Id, Status, InvId, BillId, PaymentId } = data;
+
+      if (Status === "SUCCESS") {
+        // Обработка чарджбэка - списать ФедорКоины, заблокировать пользователя
+        logger.warn(`Chargeback processed: ${Id}, Payment: ${PaymentId}`);
+        // Здесь можно списать ФедорКоины, заблокировать пользователя
+      }
+
+      return { success: true, message: 'Chargeback processed' };
+    } catch (error) {
+      logger.error('Error handling chargeback webhook', error);
+      return { success: false, message: 'Internal error' };
+    }
+  }
 }

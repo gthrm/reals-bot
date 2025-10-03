@@ -1084,17 +1084,14 @@ app.post("/webhook/refund", async (req: Request, res: Response) => {
   try {
     logger.info("Received refund webhook", req.body);
 
-    const { Id, Amount, Currency, Status, InvId, BillId, PaymentId } = req.body;
+    // Проверяем подпись через PaymentService
+    const result = await paymentService.handleRefundWebhook(req.body);
 
-    if (Status === "SUCCESS") {
-      // Обработка успешного возврата
-      // Можно списать ФедорКоины у пользователя или заблокировать аккаунт
-      logger.info(
-        `Refund processed: ${Id}, Amount: ${Amount} ${Currency}, Payment: ${PaymentId}`
-      );
+    if (result.success) {
+      res.status(200).send("OK");
+    } else {
+      res.status(400).send(result.message);
     }
-
-    res.status(200).send("OK");
   } catch (error) {
     logger.error("Error processing refund webhook", error);
     res.status(500).send("Internal Server Error");
@@ -1106,14 +1103,14 @@ app.post("/webhook/chargeback", async (req: Request, res: Response) => {
   try {
     logger.info("Received chargeback webhook", req.body);
 
-    const { Id, Status, InvId, BillId, PaymentId } = req.body;
+    // Проверяем подпись через PaymentService
+    const result = await paymentService.handleChargebackWebhook(req.body);
 
-    if (Status === "SUCCESS") {
-      // Обработка чарджбэка - списать ФедорКоины, заблокировать пользователя
-      logger.warn(`Chargeback processed: ${Id}, Payment: ${PaymentId}`);
+    if (result.success) {
+      res.status(200).send("OK");
+    } else {
+      res.status(400).send(result.message);
     }
-
-    res.status(200).send("OK");
   } catch (error) {
     logger.error("Error processing chargeback webhook", error);
     res.status(500).send("Internal Server Error");
