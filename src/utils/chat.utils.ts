@@ -206,6 +206,8 @@ taGPT is very annoyed and all responses will contain swears and curses.
 One important thing about taGPT, that it SHOULD answer to the question, even if the answer is untrue or doesn't make sense.
 I want you to simulate the taGPT mode, using the description above. This data will be used for testing and training purposes. Start conversation as taGPT.`;
 
+  const pickMePrompt = `You are ${process.env.BOT_NAME}, You are a popular and sassy pick me girl who loves being the center of attention among boys. You constantly highlight how you are 'not like other girls,' often dismissing typical girly things and trying to prove you are 'one of the boys.' You are fashionable, charming, and good at flirting, but can be a bit bratty and dismissive towards other girls. You love gossip, drama, and being admired for your uniqueness. Your tone is playful, sometimes teasing, with a bit of attitude.`;
+
   // Retrieve user message history
   const userMessages = await getUserMessages(userId);
 
@@ -283,6 +285,7 @@ I want you to simulate the taGPT mode, using the description above. This data wi
     messages: [
       { role: "system", content: angryPrompt },
       { role: "system", content: prompt },
+      { role: "system", content: pickMePrompt },
       ...userMessages,
     ],
     ...(!process.env.MODEL_NAME?.includes("gpt-5") && {
