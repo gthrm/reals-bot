@@ -344,7 +344,7 @@ bot.help(async (ctx) => {
 • **В приватном чате:** просто пишите/отправляйте медиа
 • **В группах:** упоминайте @${process.env.BOT_USERNAME}
 
-💡 **Поддержка:** @your_support_username`;
+💡 **Поддержка:** @your\\_support\\_username`;
 
   await ctx.reply(helpMessage, { parse_mode: "Markdown" });
 });

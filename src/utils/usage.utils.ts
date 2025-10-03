@@ -53,6 +53,11 @@ export class UsageService {
     return 0.5; // Fixed cost for text requests
   }
 
+  // Check if user is VIP (from LOCAL_CHAT_ID)
+  private isVipUser(userId: string | number): boolean {
+    return process.env.LOCAL_CHAT_ID?.includes(`${userId}`) || false;
+  }
+
   // Check if user can use a service
   async canUseService(
     userId: string | number, 
@@ -63,6 +68,11 @@ export class UsageService {
     try {
       // Ensure user exists
       await this.ensureUser(userId);
+      
+      // VIP users from LOCAL_CHAT_ID have unlimited access
+      if (this.isVipUser(userId)) {
+        return { canUse: true, cost: 0 }; // Free for VIP users
+      }
       
       let cost = 0;
       switch (serviceType) {
@@ -97,6 +107,14 @@ export class UsageService {
     try {
       // Ensure user exists
       await this.ensureUser(userId);
+
+      // VIP users from LOCAL_CHAT_ID get free unlimited access
+      if (this.isVipUser(userId)) {
+        // Log usage but don't charge
+        await this.db.logUsage(userId, serviceType, 0, duration, fileSize, true);
+        
+        return { success: true, wasFree: true, cost: 0 };
+      }
 
       let cost = 0;
       switch (serviceType) {

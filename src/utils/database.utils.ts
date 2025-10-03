@@ -388,6 +388,31 @@ export class DatabaseClient {
     }
   }
 
+  async logUsage(
+    userId: string | number,
+    requestType: ServiceType,
+    cost: number,
+    duration?: number,
+    fileSize?: number,
+    wasFree: boolean = false
+  ): Promise<void> {
+    try {
+      await this.prisma.usageLog.create({
+        data: {
+          userId: BigInt(userId),
+          requestType,
+          cost,
+          duration,
+          fileSize,
+          wasFree,
+        },
+      });
+    } catch (error) {
+      logger.error('Error logging usage', error);
+      throw error;
+    }
+  }
+
   async close(): Promise<void> {
     try {
       await this.prisma.$disconnect();
